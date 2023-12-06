@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Products {
+  UUID                String    @id(map: "products_uuid") @unique() @default(uuid()) @db.VarChar(36) //UUIDv4
+  name                String    @db.VarChar(20)
+  description         String    @db.Text()
+  price               Float
+  quantity            Int       @default(1)
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @default(now())
+
+  orders belong[]
+}
+
+model Users {
+  UUID        String         @id(map: "users_uuid") @unique() @default(uuid()) @db.VarChar(36) //UUIDv4
+  pseudo      String         @db.VarChar(20)
+  username    String         @db.VarChar(30)
+  password    String         @db.VarChar(72)
+  created_at  DateTime       @default(now())
+
+  Orders      Orders[]
+}
+
+model Orders {
+  number           Int        @id @default(autoincrement()) @unique()
+  total_cost_ht    String     @db.VarChar(36)
+  total_quantity   Int        @default(1)
+  created_at       DateTime   @default(now())
+  deliver_at       DateTime   @default(now())
+  
+  userUUID       String       @db.VarChar(36)
+  User           Users        @relation(map: "order_user", fields: [userUUID], references: [UUID])
+  Products       belong[]
+}
+
+model belong {
+  order_number    Int          
+  product_UUID    String
+
+  order         Orders        @relation(fields: [order_number], references: [number])
+  product       Products      @relation(fields: [product_UUID], references: [UUID])
+
+  @@id([order_number, product_UUID])
+}
