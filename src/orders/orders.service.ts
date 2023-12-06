@@ -4,7 +4,7 @@ import { CreateOrderDTO } from './dto/create-order.dto';
 import { UpdateOrderDTO } from './dto/update-order.dto';
 
 @Injectable()
-export class OrderService {
+export class OrdersService {
   private orders = []; // Replace with your actual data store (database, in-memory storage, etc.)
 
   createOrder(createOrderDTO: CreateOrderDTO) {
