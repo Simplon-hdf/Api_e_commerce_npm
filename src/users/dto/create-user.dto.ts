@@ -22,10 +22,19 @@ export class CreateUserDto {
 
     @ApiProperty({
         description: 'This field represents the new user password',
-        minLength: 5,
+        minLength: 72,
         maxLength: 72,
       })
     @IsString()
-    @Length(5, 72)
+    @Length(72, 72)
     password: string;
+
+    @ApiProperty({
+        description: 'This field represents the new user UUID',
+        minLength: 36,
+        maxLength: 36,
+      })
+    @IsString()
+    @Length(36, 36)
+    UUID: string;
 }
