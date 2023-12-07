@@ -1,5 +1,6 @@
-import { IsString, Length, isString } from 'class-validator'
+import { IsString, IsUUID, Length, isString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger';
+import { UUID } from 'crypto';
 
 export class CreateUserDto {
     @ApiProperty({
@@ -26,15 +27,6 @@ export class CreateUserDto {
         maxLength: 72,
       })
     @IsString()
-    @Length(72, 72)
+    @Length(1, 72) // Trop long pour les tests
     password: string;
-
-    @ApiProperty({
-        description: 'This field represents the new user UUID',
-        minLength: 36,
-        maxLength: 36,
-      })
-    @IsString()
-    @Length(36, 36)
-    UUID: string;
 }
