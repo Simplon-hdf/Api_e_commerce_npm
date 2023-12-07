@@ -10,18 +10,16 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   public async create(createUserDto: CreateUserDto) {
-    const createdUser = new NormalizedResponse(
-      `User ${createUserDto.pseudo} has been created`,
-      await this.prisma.users.create({
-    data: {
+    return new NormalizedResponse(
+        `User ${createUserDto.pseudo} has been created`,
+        await this.prisma.users.create({
+            data: {
       pseudo: createUserDto.pseudo,
       username: createUserDto.username,
       password: createUserDto.password,
-      created_at: new Date(),
-        },
-      }),
-    );
-  return createdUser.toJSON();
+    },
+  }),
+).toJSON();
 }
 
   findAll() {
