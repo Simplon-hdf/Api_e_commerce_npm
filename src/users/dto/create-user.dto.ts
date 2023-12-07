@@ -1,6 +1,6 @@
 export class CreateUserDto {
 
-pseudo?: string;
+pseudo: string;
 username: string;
 password: string;
 }
