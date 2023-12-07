@@ -40,8 +40,15 @@ Vous devez créer une API d'e-commerce pour permettre à des utilisateurs de com
 
 ### MCD
 
-![](assets/mcd.png)
+![](Image/mcd.png)
 
 ### MLD
 
-![](assets/mld.png)
+![](Image/mld.png)
+
+Les dépendances requises peuvent être installées via les commandes suivantes :
+```npm -i @prisma/client```
+```npx prisma generate```
+par la suite, ```npx prisma migrate dev``` ne doit psa générer d'erreurs.
+```npm install class-validator``` (qui dépend lui-même de)  ```npm install reflect-metadata```
+
