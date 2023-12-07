@@ -13,7 +13,7 @@ public async create(createUserDto: CreateUserDto) {
       pseudo: createUserDto.pseudo,
       username: createUserDto.username,
       password: createUserDto.password,
-      created_at: createUserDto.created_at,
+      created_at: new Date(),
     },
   });
   return createdUser;
@@ -41,13 +41,17 @@ public async create(createUserDto: CreateUserDto) {
         pseudo: !!updateUserDto.pseudo ? updateUserDto.pseudo : undefined,
         username: !!updateUserDto.username ? updateUserDto.username : undefined,
         password: !!updateUserDto.password ? updateUserDto.password : undefined,
-        created_at: !!updateUserDto.created_at ? updateUserDto.created_at : undefined,
       },
     });
     return updatedUser;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  public async deleteByUUID(uuid: string) {
+    const deletedUser = await this.prisma.users.delete({
+      where: {
+        UUID: uuid,
+      },
+    });
+    return deletedUser;
+}
 }
