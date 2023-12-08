@@ -16,8 +16,8 @@ model Products {
   description         String    @db.Text()
   price               Float
   quantity            Int       @default(1)
-  created_at          DateTime  @default(now())
-  updated_at          DateTime  @default(now())
+  created_at          DateTime  @default(now()) @db.Date()
+  updated_at          DateTime  @default(now()) @db.Date()
 
   orders belong[]
 }
@@ -27,20 +27,20 @@ model Users {
   pseudo      String         @db.VarChar(20)
   username    String         @db.VarChar(30)
   password    String         @db.VarChar(72)
-  created_at  DateTime       @default(now())
+  created_at  DateTime       @default(now()) @db.Date()
 
   Orders      Orders[]
 }
 
 model Orders {
   number           Int        @id @default(autoincrement()) @unique()
-  total_cost_ht    String     @db.VarChar(36)
+  total_cost_ht    Float
   total_quantity   Int        @default(1)
-  created_at       DateTime   @default(now())
-  deliver_at       DateTime   @default(now())
+  created_at       DateTime   @default(now()) @db.Date()
+  deliver_at       DateTime   @default(now()) @db.Date()
   
   userUUID       String       @db.VarChar(36)
-  User           Users        @relation(map: "order_user", fields: [userUUID], references: [UUID])
+  User           Users        @relation(map: "order_user_fk", fields: [userUUID], references: [UUID])
   Products       belong[]
 }
 
@@ -48,8 +48,9 @@ model belong {
   order_number    Int          
   product_UUID    String
 
-  order         Orders        @relation(fields: [order_number], references: [number])
-  product       Products      @relation(fields: [product_UUID], references: [UUID])
+  order         Orders        @relation(map: "belong_order_number", fields: [order_number], references: [number])
+  product       Products      @relation(map: "belong_product_uuid", fields: [product_UUID], references: [UUID])
 
   @@id([order_number, product_UUID])
+  @@unique([order_number, product_UUID])
 }
