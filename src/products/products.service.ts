@@ -62,4 +62,8 @@ export class ProductsService {
     );
     return deletedProduct.toJSON();
   }
+
+  public async getAllProducts() {
+    return this.prisma.products.findMany();
+  }
 }
