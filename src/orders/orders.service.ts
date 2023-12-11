@@ -33,8 +33,8 @@ export class OrdersService {
 
     return await this.prisma.orders.create({
       data: {
-        total_cost_ht: totalCost,
-        User: {
+        total_cost: totalCost,
+        user: {
           connect: {
             UUID: createOrderDto.user_uuid,
           },
@@ -50,9 +50,9 @@ export class OrdersService {
         deliver_at: await this.generateForwardDate(7),
       },
       select: {
-        total_cost_ht: true,
-        User: true,
-        total_quantity: true,
+        total_cost: true,
+        user: true,
+        total_product_quantity: true,
         Belong: {
           select: {
             Product: true,
