@@ -1,44 +1,87 @@
-// src/orders/order.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateOrderDTO } from './dto/create-order.dto';
-import { UpdateOrderDTO } from './dto/update-order.dto';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class OrdersService {
-  private orders = []; // Replace with your actual data store (database, in-memory storage, etc.)
+  constructor(private readonly prisma: PrismaService) {}
 
-  createOrder(createOrderDTO: CreateOrderDTO) {
-    // Logic to create an order
-    const newOrder = {
-      orderId: this.orders.length + 1,
-      ...createOrderDTO,
-    };
-    this.orders.push(newOrder);
-    return newOrder;
+  private async generateForwardDate(daysToAdd: number, from?: Date) {
+    const newDate = from ?? new Date();
+    newDate.setDate(newDate.getDate() + daysToAdd);
+    return newDate;
   }
 
-  getOrder(orderId: string) {
-    // Logic to retrieve an order
-    const order = this.orders.find(o => o.orderId === +orderId);
-    if (!order) {
-      throw new NotFoundException('Order not found');
-    }
-    return order;
+  private async getProducts(productUUIDS: string[]) {
+    return await this.prisma.products.findMany({
+      where: {
+        OR: productUUIDS.map((product) => ({
+          UUID: product,
+        })),
+      },
+    });
   }
 
-  updateOrder(orderId: string, updateOrderDTO: UpdateOrderDTO) {
-    // Logic to update an order
-    const orderIndex = this.orders.findIndex(o => o.orderId === +orderId);
-    if (orderIndex === -1) {
-      throw new NotFoundException('Order not found');
-    }
+  public async create(createOrderDto: CreateOrderDTO) {
+    const orderedProducts = await this.getProducts(
+      createOrderDto.product_uuid,
+    );
 
-    this.orders[orderIndex] = {
-      ...this.orders[orderIndex],
-      ...updateOrderDTO,
-    };
+    const totalCost = orderedProducts
+      .map((product) => product.price)
+      .reduce((total, current) => total + current);
 
-    return this.orders[orderIndex];
+    return await this.prisma.orders.create({
+      data: {
+        total_cost: totalCost,
+        user: {
+          connect: {
+            UUID: createOrderDto.user_uuid,
+          },
+        },
+        Belong: {
+          createMany: {
+            data: orderedProducts.map((product) => ({
+              product_UUID: product.UUID,
+            })),
+          },
+        },
+        total_product_quantity: orderedProducts.length,
+        deliver_at: await this.generateForwardDate(7),
+      },
+      select: {
+        total_cost: true,
+        user: true,
+        total_product_quantity: true,
+        Belong: {
+          select: {
+            Product: true,
+          },
+        },
+      },
+    });
+  }
+
+  public async getByNumber(orderNumber: number) {
+    return await this.prisma.orders.findUnique({
+      where: {
+        number: orderNumber,
+      },
+      include: {
+        Belong: {
+          select: {
+            Product: true,
+          },
+        },
+      },
+    });
+  }
+
+  public async deleteByNumber(orderNumber: number) {
+    return await this.prisma.orders.delete({
+      where: {
+        number: orderNumber,
+      },
+    });
   }
 }
-

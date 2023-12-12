@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,45 +8,44 @@ datasource db {
 }
 
 model Products {
-  UUID                String    @id(map: "products_uuid") @unique() @default(uuid()) @db.VarChar(36) //UUIDv4
-  name                String    @db.VarChar(20)
-  description         String    @db.Text()
-  price               Float
-  quantity            Int       @default(1)
-  created_at          DateTime  @default(now())
-  updated_at          DateTime  @default(now())
-
-  orders belong[]
+  UUID        String   @id(map: "products_pk") @unique() @default(uuid()) @db.Char(36)
+  name        String   @db.VarChar(20)
+  description String   @db.Text()
+  price       Float
+  quantity    Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+  Belong      Belong[]
 }
 
 model Users {
-  UUID        String         @id(map: "users_uuid") @unique() @default(uuid()) @db.VarChar(36) //UUIDv4
-  pseudo      String         @db.VarChar(20)
-  username    String         @db.VarChar(30)
-  password    String         @db.VarChar(72)
-  created_at  DateTime       @default(now())
-
-  Orders      Orders[]
+  UUID       String   @id(map: "users_pk") @unique() @default(uuid()) @db.Char(36)
+  nickname   String   @db.VarChar(20)
+  username   String   @db.VarChar(30)
+  password   String   @db.VarChar(72)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  Orders     Orders[]
 }
 
 model Orders {
-  number           Int        @id @default(autoincrement()) @unique()
-  total_cost_ht    String     @db.VarChar(36)
-  total_quantity   Int        @default(1)
-  created_at       DateTime   @default(now())
-  deliver_at       DateTime   @default(now())
-  
-  userUUID       String       @db.VarChar(36)
-  User           Users        @relation(map: "order_user", fields: [userUUID], references: [UUID])
-  Products       belong[]
+  number                 Int      @id(map: "orders_pk") @unique() @default(autoincrement())
+  total_cost             Float
+  total_product_quantity Int
+  created_at             DateTime @default(now())
+  updated_at             DateTime @default(now())
+  deliver_at             DateTime
+  user_UUID              String   @db.Char(36)
+  user                   Users    @relation(map: "user_fk", fields: [user_UUID], references: [UUID], onDelete: Cascade)
+  Belong                 Belong[]
 }
 
-model belong {
-  order_number    Int          
-  product_UUID    String
+model Belong {
+  order_number Int
+  product_UUID String   @db.Char(36)
+  Product      Products @relation(map: "products_uuid_fk", fields: [product_UUID], references: [UUID])
+  Order        Orders   @relation(map: "orders_uuid_fk", fields: [order_number], references: [number])
 
-  order         Orders        @relation(fields: [order_number], references: [number])
-  product       Products      @relation(fields: [product_UUID], references: [UUID])
-
-  @@id([order_number, product_UUID])
+  @@id([product_UUID, order_number])
+  @@unique([product_UUID, order_number])
 }
