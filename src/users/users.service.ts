@@ -14,7 +14,7 @@ export class UsersService {
         `User ${createUserDto.pseudo} has been created`,
         await this.prisma.users.create({
             data: {
-      pseudo: createUserDto.pseudo,
+      nickname: createUserDto.pseudo,
       username: createUserDto.username,
       password: createUserDto.password,
     },
@@ -46,7 +46,7 @@ export class UsersService {
         UUID: uuid,
       },
       data: {
-        pseudo: !!updateUserDto.pseudo ? updateUserDto.pseudo : undefined,
+        nickname: !!updateUserDto.pseudo ? updateUserDto.pseudo : undefined,
         username: !!updateUserDto.username ? updateUserDto.username : undefined,
         password: !!updateUserDto.password ? updateUserDto.password : undefined,
       },
